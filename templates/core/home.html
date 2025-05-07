@@ -1,0 +1,466 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<!-- Hero Carousel Section -->
+<div class="hero-container">
+  <div class="carousel-arrow left" onclick="slideCarousels('left')">
+    <i class="fas fa-chevron-left"></i>
+  </div>
+
+  <div class="carousels-wrapper">
+    <div class="slides-container">
+      {% for i in '1234'|make_list %}
+      <div id="heroCarousel{{ forloop.counter0 }}" class="carousel slide hero has-image shadow-sm{% if forloop.first %} active{% endif %}" data-bs-ride="carousel">
+        <div class="carousel-inner container rounded py-4">
+          <div class="carousel-item active">
+            <div class="row align-items-center">
+              <div class="col-md-12">
+                <h1 class="block-number">{{ forloop.counter }}</h1>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="carousel-indicators">
+      {% for i in '1234'|make_list %}
+      <button type="button" class="carousel-indicator{% if forloop.first %} active{% endif %}" data-slide="{{ forloop.counter0 }}"></button>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="carousel-arrow right" onclick="slideCarousels('right')">
+    <i class="fas fa-chevron-right"></i>
+  </div>
+</div>
+
+<script>
+(() => {
+  const state = {
+    currentSlide: 0,
+    totalSlides: 4,
+    slideWidth: 0,
+    container: null,
+    slides: null,
+    gaps: [8, 6, 4], // gaps entre slides consecutivos
+    autoplayInterval: null
+  };
+
+  function updateSlideWidth() {
+    const baseWidth = state.slides[0].offsetWidth;
+    state.slideWidth = baseWidth + (state.currentSlide > 0 ? state.gaps[state.currentSlide - 1] : 0);
+  }
+
+  function updateActiveSlide() {
+    // Atualiza classes ativas dos slides
+    state.slides.forEach((slide, index) => {
+      if (index === state.currentSlide) {
+        slide.classList.add('active');
+        setTimeout(() => slide.style.opacity = '1', 50);
+      } else {
+        slide.style.opacity = '0.7';
+        slide.classList.remove('active');
+      }
+    });
+
+    // Atualiza indicadores
+    document.querySelectorAll('.carousel-indicator').forEach((indicator, index) => {
+      indicator.classList.toggle('active', index === state.currentSlide);
+    });
+
+    const offset = (window.innerWidth - state.slideWidth) / 2;
+    let translateX = -(state.currentSlide * state.slideWidth);
+    
+    // Ajusta o translateX baseado nos diferentes gaps
+    for (let i = 0; i < state.currentSlide; i++) {
+      translateX -= (state.gaps[i] || 0);
+    }
+    
+    translateX += offset - 200;
+    
+    // Aplica a transição suave
+    requestAnimationFrame(() => {
+      state.container.style.transform = `translateX(${translateX}px)`;
+    });
+  }
+
+  function slideCarousels(direction) {
+    if (typeof direction === 'number') {
+      state.currentSlide = direction;
+    } else {
+      state.currentSlide = direction === 'right' 
+        ? (state.currentSlide + 1) % state.totalSlides 
+        : (state.currentSlide - 1 + state.totalSlides) % state.totalSlides;
+    }
+    
+    updateActiveSlide();
+    resetAutoplay();
+  }
+
+  function startAutoplay() {
+    state.autoplayInterval = setInterval(() => {
+      slideCarousels('right');
+    }, 7000); // Alterado para 7 segundos
+  }
+
+  function resetAutoplay() {
+    if (state.autoplayInterval) {
+      clearInterval(state.autoplayInterval);
+    }
+    startAutoplay();
+  }
+
+  function init() {
+    state.container = document.querySelector('.slides-container');
+    state.slides = Array.from(document.querySelectorAll('.hero'));
+    
+    // Adiciona eventos de clique aos indicadores
+    document.querySelectorAll('.carousel-indicator').forEach((indicator, index) => {
+      indicator.addEventListener('click', () => {
+        slideCarousels(index);
+      });
+    });
+    
+    // Adiciona eventos de clique às setas
+    document.querySelectorAll('.carousel-arrow').forEach((arrow) => {
+      arrow.addEventListener('click', () => {
+      });
+    });
+    
+    updateSlideWidth();
+    updateActiveSlide();
+    startAutoplay();
+
+    window.addEventListener('resize', () => {
+      updateSlideWidth();
+      updateActiveSlide();
+    });
+
+    // Pausa o autoplay quando o mouse está sobre o carousel
+    document.querySelector('.hero-container').addEventListener('mouseenter', () => {
+      clearInterval(state.autoplayInterval);
+    });
+
+    // Reinicia o autoplay quando o mouse sai do carousel
+    document.querySelector('.hero-container').addEventListener('mouseleave', () => {
+      startAutoplay();
+    });
+
+    window.slideCarousels = slideCarousels;
+  }
+
+  document.addEventListener('DOMContentLoaded', init);
+})();
+</script>
+
+<!-- Serviços em Destaque -->
+<section id="servicos" class="services py-5">
+    <div class="container">
+        <h2 class="section-title text-center mb-5">Nossos Serviços</h2>
+        <div class="row">
+            {% for servico in servicos %}
+            <div class="col-md-4 mb-4">
+                <div class="service-card" data-toggle="modal" data-target="#servicoModal{{ forloop.counter }}">
+                    <div class="service-icon">
+                        <i class="{{ servico.icone }}"></i>
+                    </div>
+                    <h3 class="service-title">{{ servico.titulo }}</h3>
+                    <p class="service-description">{{ servico.descricao }}</p>
+                    <span class="service-link">Saiba mais <i class="fas fa-arrow-right"></i></span>
+                </div>
+            </div>
+
+            <!-- Modal para cada serviço -->
+            <div class="modal fade" id="servicoModal{{ forloop.counter }}" tabindex="-1" role="dialog" aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3 class="modal-title">
+                                <i class="{{ servico.icone }} mr-2"></i>
+                                {{ servico.titulo }}
+                            </h3>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h4>Descrição</h4>
+                                    <p>{{ servico.descricao }}</p>
+                                    
+                                    <h4 class="mt-4">Características</h4>
+                                    <ul class="service-features">
+                                        {% if servico.titulo == 'Cópia de grandes formatos' %}
+                                            <li>Plantas arquitetônicas</li>
+                                            <li>Projetos de engenharia</li>
+                                            <li>Banners e cartazes</li>
+                                            <li>Formatos até A0</li>
+                                        {% elif servico.titulo == 'Encadernações' %}
+                                            <li>Espiral plástico</li>
+                                            <li>Wire-o metálico</li>
+                                            <li>Encadernação térmica</li>
+                                            <li>Capa dura personalizada</li>
+                                        {% elif servico.titulo == 'Digitalização' %}
+                                            <li>Scanner profissional</li>
+                                            <li>Alta resolução</li>
+                                            <li>OCR disponível</li>
+                                            <li>Diversos formatos de arquivo</li>
+                                        {% elif servico.titulo == 'Engenharia' %}
+                                            <li>Plotagem CAD</li>
+                                            <li>Impressão colorida ou P&B</li>
+                                            <li>Dobra automática</li>
+                                            <li>Papel sulfite ou vegetal</li>
+                                        {% elif servico.titulo == 'Cópia e impressão laser' %}
+                                            <li>Impressão frente e verso</li>
+                                            <li>Papéis especiais</li>
+                                            <li>Alta qualidade</li>
+                                            <li>Gramatura até 300g</li>
+                                        {% elif servico.titulo == 'Plastificação e laminação' %}
+                                            <li>Polaseal brilho ou fosco</li>
+                                            <li>Laminação a frio</li>
+                                            <li>Proteção UV</li>
+                                            <li>Diversos formatos</li>
+                                        {% elif servico.titulo == 'Banners e Adesivos' %}
+                                            <li>Lona 440g</li>
+                                            <li>Adesivo vinil</li>
+                                            <li>Acabamento com ilhós</li>
+                                            <li>Recorte eletrônico</li>
+                                        {% elif servico.titulo == 'Serviços Gráficos' %}
+                                            <li>Design profissional</li>
+                                            <li>Acabamento especial</li>
+                                            <li>Papéis nobres</li>
+                                            <li>Prova digital</li>
+                                        {% endif %}
+                                    </ul>
+                                </div>
+                                <div class="col-md-6">
+                                    <h4>Exemplos</h4>
+                                    <div class="service-examples" style="height:320px;">
+                                        {% if servico.imagem_exemplo %}
+                                            <img src="{{ servico.imagem_exemplo }}" alt="Exemplo {{ servico.titulo }}" style="width:100%;height:100%;object-fit:cover;border-radius:8px;box-shadow:0 2px 12px rgba(0,0,0,0.10);">
+                                        {% else %}
+                                            <div class="example-placeholder">
+                                                <i class="fas fa-images"></i>
+                                                <p>Exemplos em breve</p>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <a href="https://wa.me/5521925243817" class="btn btn-success" target="_blank">
+                                <i class="fab fa-whatsapp"></i> Solicitar Orçamento
+                            </a>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Sobre Section -->
+<section id="sobre" class="py-5">
+    <div class="container">
+        <h2 class="text-center mb-4">Quem Somos</h2>
+        <div class="row">
+            <div class="col-md-8 mx-auto">
+                <p class="text-center">Fundada em fevereiro de 2014, a Copycentral é fruto da extinta Copiadora Av. Central que encerrou suas atividades no final de 2013, depois de mais de 50 anos de existência, foi quando quatro ex funcionários perceberam a oportunidade de iniciarem o seu próprio negócio aproveitando os clientes que já atendiam.</p>
+                <p class="text-center">Somos uma copiadora e Bureau de impressão, dando soluções para cópias e impressões de todos os formatos, coloridas e preto e branco, digitalização de documentos e projetos, além de acabamento em geral como encadernações e plastificações.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Projetos Especiais -->
+<section class="special-projects py-5 bg-light">
+    <div class="container">
+        <h2 class="section-title text-center mb-5">Projetos Especiais</h2>
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="project-card">
+                    <div class="project-content">
+                        <h3>Projeto 1</h3>
+                        <p>Descrição do projeto</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="project-card">
+                    <div class="project-content">
+                        <h3>Projeto 2</h3>
+                        <p>Descrição do projeto</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="project-card">
+                    <div class="project-content">
+                        <h3>Projeto 3</h3>
+                        <p>Descrição do projeto</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Depoimentos -->
+<section class="testimonials py-5">
+    <div class="container">
+        <h2 class="section-title text-center mb-5">O que nossos clientes dizem</h2>
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="testimonial-card">
+                    <div class="testimonial-content">
+                        <p>"Excelente atendimento e qualidade nos serviços. Sempre entregam no prazo e com preços justos."</p>
+                    </div>
+                    <div class="testimonial-author">
+                        <h4>João Silva</h4>
+                        <p>Arquiteto</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="testimonial-card">
+                    <div class="testimonial-content">
+                        <p>"Profissionais muito competentes. Fazem impressões de alta qualidade e o acabamento é impecável."</p>
+                    </div>
+                    <div class="testimonial-author">
+                        <h4>Maria Santos</h4>
+                        <p>Designer</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="testimonial-card">
+                    <div class="testimonial-content">
+                        <p>"Melhor copiadoria que já utilizei. Ótimo atendimento e preços competitivos."</p>
+                    </div>
+                    <div class="testimonial-author">
+                        <h4>Pedro Oliveira</h4>
+                        <p>Engenheiro</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Contato -->
+<section id="contato" class="contact py-5 bg-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6">
+                <h2 class="section-title mb-4">Entre em Contato</h2>
+                <form class="contact-form" id="contactForm">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <input type="text" class="form-control" id="nome" name="nome" placeholder="Nome completo" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="email" class="form-control" id="email" name="email" placeholder="E-mail" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="tel" class="form-control" id="telefone" name="telefone" placeholder="Telefone" required>
+                    </div>
+                    <div class="form-group">
+                        <textarea class="form-control" id="mensagem" name="mensagem" rows="4" placeholder="Mensagem" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">Enviar mensagem</button>
+                </form>
+
+                <!-- Notificações -->
+                <div class="position-fixed bottom-0 right-0 p-3" style="z-index: 5; right: 0; bottom: 0;">
+                    <div id="notificationSuccess" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true" data-delay="4000">
+                        <div class="toast-header bg-success text-white">
+                            <strong class="mr-auto">Sucesso!</strong>
+                            <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="toast-body">
+                            Mensagem enviada com sucesso!
+                        </div>
+                    </div>
+                    <div id="notificationError" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true" data-delay="4000">
+                        <div class="toast-header bg-danger text-white">
+                            <strong class="mr-auto">Erro</strong>
+                            <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="toast-body">
+                            Ocorreu um erro ao enviar a mensagem. Tente novamente.
+                        </div>
+                    </div>
+                </div>
+
+                <script>
+                document.getElementById('contactForm').addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const formData = {
+                        nome: document.getElementById('nome').value,
+                        email: document.getElementById('email').value,
+                        telefone: document.getElementById('telefone').value,
+                        mensagem: document.getElementById('mensagem').value
+                    };
+
+                    fetch('/enviar-email/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                        },
+                        body: JSON.stringify(formData)
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            $('#notificationSuccess').toast('show');
+                            document.getElementById('contactForm').reset();
+                        } else {
+                            $('#notificationError').toast('show');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        $('#notificationError').toast('show');
+                    });
+                });
+                </script>
+            </div>
+            <div class="col-lg-6">
+                <div class="contact-info">
+                    <h3>Informações de Contato</h3>
+                    <p>
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>
+                            Rua Bittencourt da Silva, 12 loja C, Centro - RJ
+                            <br>
+                            <small class="text-muted">Saída do Metro Carioca/Rio Branco</small>
+                        </span>
+                    </p>
+                    <p><i class="fas fa-phone"></i> (21) 2524-3817</p>
+                    <p><i class="fas fa-envelope"></i> contato@copycentral.com.br</p>
+                    <p><i class="fas fa-clock"></i> Segunda a Sexta: 8h às 18h</p>
+                    <div class="social-links mt-4">
+                        <a href="https://www.facebook.com/copycentral.centro" class="social-link" target="_blank"><i class="fab fa-facebook-f"></i></a>
+                        <a href="https://www.instagram.com/copycentral.centro" class="social-link" target="_blank"><i class="fab fa-instagram"></i></a>
+                        <a href="https://wa.me/5521925243817" class="social-link" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                        <a href="https://www.linkedin.com/company/copycentral/" class="social-link" target="_blank"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="https://maps.google.com/maps?q=Edificio+Av.+Central+-+Rua+Bittencourt+da+Silva,+12+loja+C+Centro+-+RJ" class="social-link" target="_blank"><i class="fas fa-map-marker-alt"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %} 

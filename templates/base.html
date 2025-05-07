@@ -1,0 +1,107 @@
+{% load static %}
+{% load bootstrap4 %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Copy Central - Copiadora e Bureau de Impressão</title>
+    {% bootstrap_css %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=1">
+    <link rel="icon" type="image/x-icon" href="{% static 'img/favicon.ico' %}">
+</head>
+<body>
+    <!-- Header -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'core:home' %}">
+                <img src="{% static 'img/logo.png' %}" alt="Copy Central Logo" height="65">
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#servicos">Serviços</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#sobre">Sobre Nós</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#contato">Contato</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#portfolio">Portfólio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link btn btn-whatsapp ml-2" href="https://wa.me/5521925243817" target="_blank">
+                            <i class="fab fa-whatsapp"></i>
+                            Solicitar Orçamento
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    {% block content %}
+    {% endblock %}
+
+    <!-- Footer -->
+    <footer class="footer bg-dark text-light py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-3 mb-4">
+                    <h5 class="mb-3">Copy Central</h5>
+                    <img src="{% static 'img/logo.png' %}" alt="Copy Central Logo" class="mb-3" height="50">
+                    <p class="text-muted">Sua parceira em soluções de impressão e comunicação visual desde 1995.</p>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <h5 class="mb-3">Serviços</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#impressao-digital">Impressão Digital</a></li>
+                        <li><a href="#grandes-formatos">Grandes Formatos</a></li>
+                        <li><a href="#acabamentos">Acabamentos</a></li>
+                        <li><a href="#projetos-graficos">Projetos Gráficos</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <h5 class="mb-3">Contato</h5>
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-map-marker-alt mr-2"></i>Edifício Av. Central - Centro - RJ</li>
+                        <li><i class="fas fa-phone mr-2"></i>(21) 2524-3817</li>
+                        <li><i class="fas fa-envelope mr-2"></i>contato@copycentral.com.br</li>
+                        <li><i class="fas fa-clock mr-2"></i>Seg-Sex: 9h às 18h</li>
+                    </ul>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <h5 class="mb-3">Redes Sociais</h5>
+                    <div class="social-links mb-3">
+                        <a href="https://www.facebook.com/copycentral.centro" class="mr-2" target="_blank"><i class="fab fa-facebook-f"></i></a>
+                        <a href="https://www.instagram.com/copycentral.centro" class="mr-2" target="_blank"><i class="fab fa-instagram"></i></a>
+                        <a href="https://wa.me/5521925243817" class="mr-2" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                        <a href="https://linkedin.com/company/copycentral" class="mr-2" target="_blank"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                    <a href="#newsletter" class="btn btn-outline-light btn-sm" style="margin-left: 0;">Assine nossa Newsletter</a>
+                </div>
+            </div>
+            <hr class="mt-4 mb-4 border-secondary">
+            <div class="row align-items-center">
+                <div class="col-md-6 text-center text-md-left">
+                    <p class="mb-0">&copy; {% now "Y" %} Copy Central. Todos os direitos reservados.</p>
+                </div>
+                <div class="col-md-6 text-center text-md-right">
+                    <a href="#privacidade" class="text-muted mr-3">Política de Privacidade</a>
+                    <a href="#termos" class="text-muted">Termos de Uso</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    {% bootstrap_javascript jquery='full' %}
+    <script src="{% static 'js/main.js' %}"></script>
+</body>
+</html> 
